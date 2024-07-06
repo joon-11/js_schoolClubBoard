@@ -2,9 +2,8 @@ import { useState } from "react";
 import styled from "styled-components";
 import TextInput from "../ui/TextInput";
 import Button from "../ui/Button";
-import MainPage from "./MainPage";
 import { useNavigate } from "react-router-dom";
-import App from "../../App";
+import axios from "axios";
 
 const Container = styled.div`
   width: 100%;
@@ -36,6 +35,7 @@ const MainTitleText = styled.p`
 `;
 
 const ButtonsContainer = styled.div`
+  display: flex;
   gap: 8px;
 `;
 
@@ -44,9 +44,38 @@ const StyledButton = styled(Button)`
 `;
 
 function Login(props) {
-  const [id, setId] = useState();
-  const [pw, setPw] = useState();
-  const navigator = useNavigate();
+  const [id, setId] = useState("");
+  const [pw, setPw] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    if (id === "" || pw === "") {
+      alert("아이디와 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    let body = {
+      id: id,
+      pw: pw,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:7070/api/login",
+        body
+      );
+
+      const json = response.data;
+      if (json.isLogin === "True") {
+        alert("로그인 성공");
+        navigate("/MainPage");
+      } else {
+        alert("로그인 실패: " + json.message);
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      alert("로그인 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <Wrapper>
@@ -54,6 +83,7 @@ function Login(props) {
         <MainTitleText>로그인</MainTitleText>
         <TextInput
           height={20}
+          placeholder="아이디"
           value={id}
           onChange={(event) => {
             setId(event.target.value);
@@ -61,22 +91,19 @@ function Login(props) {
         />
         <TextInput
           height={20}
+          type="pw"
+          placeholder="비밀번호"
           value={pw}
           onChange={(event) => {
             setPw(event.target.value);
           }}
         />
         <ButtonsContainer>
-          <Button
-            title={"로그인"}
-            onClick={() => {
-              navigator("/MainPage");
-            }}
-          />
-          <Button
+          <StyledButton title={"로그인"} onClick={handleLogin} />
+          <StyledButton
             title={"회원가입"}
             onClick={() => {
-              navigator("/Join");
+              navigate("/Join");
             }}
           />
         </ButtonsContainer>

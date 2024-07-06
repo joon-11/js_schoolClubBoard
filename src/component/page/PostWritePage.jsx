@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import TextInput from "../ui/TextInput";
 import Button from "../ui/Button";
+import axios from "axios";
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -28,11 +29,33 @@ const MainTitleText = styled.p`
   text-align: center;
 `;
 
-function PostWritePage(props) {
+function PostWritePage() {
   const navigate = useNavigate();
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:7070/api/write",
+        {
+          title,
+          contents: content,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.data.status) {
+        alert("글 작성이 완료되었습니다.");
+        navigate("/MainPage");
+      } else {
+        alert("글 작성에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("글 작성 중 오류가 발생했습니다.", error);
+      alert("글 작성 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <Wrapper>
@@ -41,23 +64,14 @@ function PostWritePage(props) {
         <TextInput
           height={20}
           value={title}
-          onChange={(event) => {
-            setTitle(event.target.value);
-          }}
+          onChange={(event) => setTitle(event.target.value)}
         />
         <TextInput
           height={480}
           value={content}
-          onChange={(event) => {
-            setContent(event.target.value);
-          }}
+          onChange={(event) => setContent(event.target.value)}
         />
-        <Button
-          title="글 작성하기"
-          onClick={() => {
-            navigate("/");
-          }}
-        />
+        <Button title="글 작성하기" onClick={handleSubmit} />
       </Container>
     </Wrapper>
   );

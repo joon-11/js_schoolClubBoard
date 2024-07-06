@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Button from "../ui/Button";
-import data from "../../data.json";
 import PostList from "../list/PostList";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -29,8 +29,29 @@ const MainTitleText = styled.p`
   text-align: center;
 `;
 
+const NoPostsText = styled.p`
+  font-size: 18px;
+  text-align: center;
+  color: #999;
+`;
+
 function MainPage(props) {
-  const navigetor = useNavigate();
+  const [titles, setTitles] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post("http://localhost:7070/api/loadMain");
+        setTitles(response.data.result || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setTitles([]); // Set titles to an empty array in case of error
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Wrapper>
@@ -39,15 +60,23 @@ function MainPage(props) {
         <Button
           title="글 작성하기"
           onClick={() => {
-            navigetor("/post-write");
+            navigate("/post-write");
           }}
         />
-        <PostList
-          posts={data}
-          onClickItem={(item) => {
-            navigetor("/post/" + item.id);
-          }}
-        />
+        {titles && titles.length > 0 ? (
+          <PostList
+            posts={titles.map((post) => ({
+              id: post.board_id,
+              title: post.title,
+            }))}
+            onClickItem={(item) => {
+              console.log(item.id);
+              navigate("/post/" + item.id);
+            }}
+          />
+        ) : (
+          <NoPostsText>게시물이 없습니다</NoPostsText>
+        )}
       </Container>
     </Wrapper>
   );

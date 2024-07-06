@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import CommentList from "../list/CommentList";
 import TextInput from "../ui/TextInput";
 import Button from "../ui/Button";
-import data from "../../data.json";
+import axios from "axios";
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -46,32 +46,58 @@ const CommentLabel = styled.p`
   font-weight: 500;
 `;
 
-function PostViewPage(props) {
+const AuthorText = styled.p`
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+`;
+
+function PostViewPage() {
   const navigate = useNavigate();
   const { postId } = useParams();
+  const [post, setPost] = useState(null); // Initialize post state
 
-  const post = data.find((item) => {
-    return item.id == postId;
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:7070/api/posts/${postId}`
+        );
+        setPost(response.data); // Update post state with fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [postId]); // Trigger useEffect when postId changes
 
   const [comment, setComment] = useState("");
 
+  // Render components conditionally based on post
   return (
     <Wrapper>
       <Container>
         <Button
           title="뒤로 가기"
           onClick={() => {
-            navigate("/");
+            navigate("/MainPage");
           }}
         />
-        <PostContainer>
-          <TitleText>{post.title}</TitleText>
-          <ContentText>{post.content}</ContentText>
-        </PostContainer>
+        {post && ( // Render only if post is not null or undefined
+          <PostContainer>
+            <TitleText>{post.title}</TitleText>
+            {post.writer && <AuthorText>By: {post.writer}</AuthorText>}
+            <ContentText>{post.contents}</ContentText>
+          </PostContainer>
+        )}
 
         <CommentLabel>댓글</CommentLabel>
-        <CommentList comments={post.comments} />
+        {post && post.comments ? (
+          <CommentList comments={post.comments} />
+        ) : (
+          <p>댓글이 없습니다.</p>
+        )}
 
         <TextInput
           height={40}

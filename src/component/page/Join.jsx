@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import TextInput from "../ui/TextInput";
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // 제목 스타일링
 const MainTitleText = styled.p`
@@ -45,12 +48,67 @@ const SubmitButton = styled.button`
   }
 `;
 
+// 라디오 버튼 컨테이너 스타일링
+const RadioContainer = styled.div`
+  display: flex;
+  gap: 20px; /* 간격 줄이기 */
+  margin-bottom: 10px;
+`;
+
 function Join(props) {
-  // 회원가입 양식을 전송하는 함수 (임시로 alert으로 표시)
+  const [id, setId] = useState("");
+  const [pw, setPw] = useState("");
+  const [auth, setAuth] = useState("");
+  const [name, setName] = useState("");
+  const [authKey, setAuthKey] = useState(""); // 인증키 상태 추가
+  const navigate = useNavigate();
+
+  // 유효성 검사 함수
+  const validateForm = () => {
+    if (
+      id === "" ||
+      pw === "" ||
+      name === "" ||
+      auth === "" ||
+      authKey === ""
+    ) {
+      alert("모든 필드를 작성해주세요.");
+      return false;
+    }
+    return true;
+  };
+
+  // 회원가입 양식을 전송하는 함수
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    let body = {
+      id: id,
+      pw: pw,
+      name: name,
+      auth: auth,
+      authKey: authKey, // 인증키 추가
+    };
+
+    try {
+      axios.post("http://localhost:7070/api/signIn", body).then((res) => {
+        const json = res.data; // 응답 데이터에 접근합니다.
+        if (json.isSign === "True") {
+          alert("회원가입 성공");
+          navigate("/");
+        } else {
+          alert(json.isSign);
+        }
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
+
     alert("회원가입 정보를 전송합니다.");
-    // 여기에 실제로 서버로 회원가입 정보를 전송하는 로직을 추가해야 합니다.
   };
 
   return (
@@ -60,21 +118,24 @@ function Join(props) {
         {/* 회원가입 양식 */}
         <form onSubmit={handleSubmit}>
           <div>
-            <FormLabel>이름</FormLabel>
+            <FormLabel>아이디</FormLabel>
             <TextInput
               height={20}
-              type="text"
-              placeholder="이름"
+              type="id"
+              placeholder="id"
               style={{ padding: "8px" }}
+              value={id}
+              onChange={(e) => setId(e.target.value)}
             />
           </div>
           <div>
-            <FormLabel>이메일</FormLabel>
+            <FormLabel>이름</FormLabel>
             <TextInput
               height={20}
-              type="email"
-              placeholder="이메일"
+              placeholder="name"
               style={{ padding: "8px" }}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div>
@@ -82,10 +143,50 @@ function Join(props) {
             <TextInput
               height={20}
               type="password"
-              placeholder="비밀번호"
+              placeholder="password"
               style={{ padding: "8px" }}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
             />
           </div>
+          <div>
+            <FormLabel>사용자 유형</FormLabel>
+            <RadioContainer>
+              <div>
+                <input
+                  type="radio"
+                  id="student"
+                  name="auth"
+                  value="student"
+                  checked={auth === "student"}
+                  onChange={(e) => setAuth(e.target.value)}
+                />
+                <label htmlFor="student">학생</label>
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  id="teacher"
+                  name="auth"
+                  value="teacher"
+                  checked={auth === "teacher"}
+                  onChange={(e) => setAuth(e.target.value)}
+                />
+                <label htmlFor="teacher">선생</label>
+              </div>
+            </RadioContainer>
+          </div>
+          <div>
+            <FormLabel>인증키</FormLabel>
+            <TextInput
+              height={20}
+              placeholder="auth key"
+              style={{ padding: "8px" }}
+              value={authKey}
+              onChange={(e) => setAuthKey(e.target.value)}
+            />
+          </div>
+
           <SubmitButton type="submit">가입하기</SubmitButton>
         </form>
       </FormBox>
