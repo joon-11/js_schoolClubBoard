@@ -8,6 +8,7 @@ import PostWritePage from './component/page/PostWritePage';
 import PostViewPage from './component/page/PostViewPage';
 import Login from './component/page/LoginPage';
 import Join from './component/page/Join';
+import UserSetting from './component/page/\bUserSetting';
 
 
 
@@ -22,6 +23,7 @@ function App() {
         <Route path='Join' element={<Join/>}/>
         <Route path="post-write" element={<PostWritePage />} />
         <Route path="post/:postId" element={<PostViewPage />} />
+        <Route path="user-settings" element={<UserSetting />} />
     </Routes>
 </BrowserRouter>
   );

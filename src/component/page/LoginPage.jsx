@@ -5,6 +5,8 @@ import Button from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+axios.defaults.withCredentials = true;
+
 const Container = styled.div`
   width: 100%;
   max-width: 720px;
@@ -12,10 +14,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  :not(:last-child) {
-    margin-bottom: 16px;
-  }
+  margin: auto;
 `;
 
 const Wrapper = styled.div`
@@ -31,7 +30,7 @@ const MainTitleText = styled.p`
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px; /* 제목과 양식 사이 간격 추가 */
+  margin-bottom: 20px;
 `;
 
 const ButtonsContainer = styled.div`
@@ -40,7 +39,7 @@ const ButtonsContainer = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-  height: 40px; /* Set the height of buttons */
+  height: 40px;
 `;
 
 function Login(props) {
@@ -54,10 +53,11 @@ function Login(props) {
       return;
     }
 
-    let body = {
+    const body = {
       id: id,
       pw: pw,
     };
+
     try {
       const response = await axios.post(
         "http://localhost:7070/api/login",
@@ -67,7 +67,7 @@ function Login(props) {
       const json = response.data;
       if (json.isLogin === "True") {
         alert("로그인 성공");
-        navigate("/MainPage");
+        navigate("/MainPage"); // MainPage 경로 확인
       } else {
         alert("로그인 실패: " + json.message);
       }
@@ -85,23 +85,19 @@ function Login(props) {
           height={20}
           placeholder="아이디"
           value={id}
-          onChange={(event) => {
-            setId(event.target.value);
-          }}
+          onChange={(event) => setId(event.target.value)}
         />
         <TextInput
           height={20}
-          type="pw"
+          type="password" // type 속성 오타 수정
           placeholder="비밀번호"
           value={pw}
-          onChange={(event) => {
-            setPw(event.target.value);
-          }}
+          onChange={(event) => setPw(event.target.value)}
         />
         <ButtonsContainer>
-          <StyledButton title={"로그인"} onClick={handleLogin} />
+          <StyledButton title="로그인" onClick={handleLogin} />
           <StyledButton
-            title={"회원가입"}
+            title="회원가입"
             onClick={() => {
               navigate("/Join");
             }}
