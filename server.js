@@ -185,10 +185,30 @@ app.post('/api/userLoad', (req, res) => {
             if(error) {
                 return res.json({status:false, error: 'Failed to get userLoad'});
             }
-            res.json(results[0]);
+            console.log(results)
+            res.json(results);
         });
     }
 });
+
+app.post('/api/deleteUser', (req, res) => {
+    dId = req.id;
+
+    if(req.session.user.roles != 'teacher') {
+        res.json({status: false});
+    }else {
+        db.query('delete from user where id = ?', [dId], (error, results) => {
+            if(error) {
+                return res.json({status:false, error: 'Failed to delete user'})
+            }
+            res.json({status: true});
+        });
+    }
+});
+
+// app.post('/api/getAuth', (req,res) => {
+//     db.query('SELECT * from authKey')
+// })
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

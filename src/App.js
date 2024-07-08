@@ -9,6 +9,7 @@ import PostViewPage from './component/page/PostViewPage';
 import Login from './component/page/LoginPage';
 import Join from './component/page/Join';
 import UserSetting from './component/page/\bUserSetting';
+import AuthKey from './component/page/AuthKey';
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="post-write" element={<PostWritePage />} />
         <Route path="post/:postId" element={<PostViewPage />} />
         <Route path="user-settings" element={<UserSetting />} />
+        <Route path="authKey" element={<AuthKey/>}/>
     </Routes>
 </BrowserRouter>
   );
