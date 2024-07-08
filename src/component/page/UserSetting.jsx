@@ -141,12 +141,12 @@ function UserSetting(props) {
   };
 
   const handleBack = () => {
-    navigate(-1); // navigate back
+    navigate("/MainPage"); // navigate back
   };
 
   const handleAuthKey = () => {
     // logic for setting auth key
-    alert("인증키 설정 버튼 클릭됨");
+    navigate("/authKey");
   };
 
   if (loading) {
@@ -159,7 +159,7 @@ function UserSetting(props) {
 
   return (
     <Container>
-      <Title>User List</Title>
+      <Title>사용자 리스트</Title>
       <UserList>
         <UserHeader>
           <UserColumn>ID</UserColumn>

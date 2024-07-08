@@ -206,9 +206,30 @@ app.post('/api/deleteUser', (req, res) => {
     }
 });
 
-// app.post('/api/getAuth', (req,res) => {
-//     db.query('SELECT * from authKey')
-// })
+app.post('/api/getAuth', (req,res) => {
+    if(req.session.user.roles != 'teacher') {
+        res.json({status: false});
+    }else {
+        db.query('SELECT * from authKey', (error, results) => {
+            if(error) {
+                return res.json({status:false, error: 'Failed to delete user'})
+            }
+            res.json({status: true, result: results})
+        });
+    }
+})
+
+app.post('/api/authRefresh', (req,res) => {
+    authKey = req.body.authKey; 
+    TauthKey = req.body.TauthKey;
+    console.log(authKey, TauthKey);
+    db.query('UPDATE authKey set authKey=?, Tauthkey=?', [authKey, TauthKey], (error, result) => {
+        if(error) {
+            return res.json({status:false, error: 'Failed to refresh'});
+        }
+        res.json({status: true});
+    });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
