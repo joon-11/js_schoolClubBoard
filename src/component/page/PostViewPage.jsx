@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import CommentList from "../list/CommentList";
 import TextInput from "../ui/TextInput";
 import Button from "../ui/Button";
 import axios from "axios";
@@ -52,10 +51,27 @@ const AuthorText = styled.p`
   color: #666;
 `;
 
+const CommentItem = styled.div`
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+`;
+
+const CommentWriter = styled.p`
+  font-size: 14px;
+  font-weight: bold;
+`;
+
+const CommentText = styled.p`
+  font-size: 14px;
+`;
+
 function PostViewPage() {
   const navigate = useNavigate();
   const { postId } = useParams();
-  const [post, setPost] = useState(null); // Initialize post state
+  const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [comment, setComment] = useState("");
+  const [userRoles, setUserRoles] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,18 +79,32 @@ function PostViewPage() {
         const response = await axios.get(
           `http://localhost:7070/api/posts/${postId}`
         );
-        setPost(response.data); // Update post state with fetched data
+        setPost(response.data.result);
+        setComments(response.data.comments);
+        setUserRoles(response.data.roles); // Update user roles
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("데이터를 가져오는 중 오류 발생:", error);
       }
     };
 
     fetchData();
-  }, [postId]); // Trigger useEffect when postId changes
+  }, [postId]);
 
-  const [comment, setComment] = useState("");
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:7070/api/posts/${postId}`
+      );
+      if (response.data.status) {
+        navigate("/MainPage");
+      } else {
+        console.error(response.data.error);
+      }
+    } catch (error) {
+      console.error("게시물 삭제 중 오류 발생:", error);
+    }
+  };
 
-  // Render components conditionally based on post
   return (
     <Wrapper>
       <Container>
@@ -84,7 +114,10 @@ function PostViewPage() {
             navigate("/MainPage");
           }}
         />
-        {post && ( // Render only if post is not null or undefined
+        {userRoles.includes("teacher") && (
+          <Button title="삭제하기" onClick={handleDelete} />
+        )}
+        {post && (
           <PostContainer>
             <TitleText>{post.title}</TitleText>
             {post.writer && <AuthorText>By: {post.writer}</AuthorText>}
@@ -93,8 +126,13 @@ function PostViewPage() {
         )}
 
         <CommentLabel>댓글</CommentLabel>
-        {post && post.comments ? (
-          <CommentList comments={post.comments} />
+        {comments.length > 0 ? (
+          comments.map((comment, index) => (
+            <CommentItem key={index}>
+              <CommentWriter>{comment.comment_writer}</CommentWriter>
+              <CommentText>{comment.comment}</CommentText>
+            </CommentItem>
+          ))
         ) : (
           <p>댓글이 없습니다.</p>
         )}
@@ -108,8 +146,28 @@ function PostViewPage() {
         />
         <Button
           title="댓글 작성하기"
-          onClick={() => {
-            navigate("/");
+          onClick={async () => {
+            try {
+              const response = await axios.post(
+                "http://localhost:7070/api/comments",
+                {
+                  postId: postId,
+                  comment: comment,
+                }
+              );
+              if (response.data.status) {
+                // 댓글이 성공적으로 작성되면, 댓글 목록을 업데이트합니다.
+                setComments([
+                  ...comments,
+                  { comment_writer: response.data.comment_writer, comment },
+                ]);
+                setComment(""); // 댓글 입력 필드를 초기화합니다.
+              } else {
+                console.error(response.data.error);
+              }
+            } catch (error) {
+              console.error("댓글 작성 중 오류 발생:", error);
+            }
           }}
         />
       </Container>

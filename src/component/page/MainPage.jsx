@@ -29,6 +29,11 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
+
+  button {
+    height: 40px; /* Adjust height as needed */
+    width: 150px; /* Adjust width as needed to ensure consistency */
+  }
 `;
 
 const MainTitleText = styled.p`
@@ -41,11 +46,6 @@ const NoPostsText = styled.p`
   font-size: 18px;
   text-align: center;
   color: #999;
-`;
-
-// Styled Button components with consistent height
-const StyledButton = styled(Button)`
-  height: 40px; /* Adjust height as needed */
 `;
 
 function MainPage(props) {
@@ -67,6 +67,19 @@ function MainPage(props) {
 
     fetchData();
   }, []);
+
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("로그아웃 하시겠습니까?");
+    if (confirmLogout) {
+      try {
+        await axios.post("http://localhost:7070/api/logout");
+        navigate("/");
+      } catch (error) {
+        console.error("Error logging out:", error);
+      }
+    }
+  };
+
   console.log(roles);
 
   return (
@@ -74,21 +87,21 @@ function MainPage(props) {
       <Container>
         <MainTitleText>게시판</MainTitleText>
         <ButtonContainer>
-          {/* Using the styled button component with consistent height */}
-          <StyledButton
+          <Button
             title="글 작성하기"
             onClick={() => {
               navigate("/post-write");
             }}
           />
           {roles.includes("teacher") && (
-            <StyledButton
+            <Button
               title="사용자 설정"
               onClick={() => {
                 navigate("/user-settings");
               }}
             />
           )}
+          <Button title="로그아웃" onClick={handleLogout} />
         </ButtonContainer>
         {titles && titles.length > 0 ? (
           <PostList

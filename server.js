@@ -148,7 +148,29 @@ app.get('/api/posts/:id', (req, res) => {
         if (results.length === 0) {
             return res.status(404).send({ error: 'Post not found' });
         }
-        res.json(results[0]);
+        db.query('SELECT comment, comment_writer from comments where board_id = ?', [postId], (error, comments) => {
+            if(error){
+                return res.json({status: false, error: error});
+            }
+            res.json({result: results[0], comments: comments, roles: req.session.user.roles});
+        });
+    });
+});
+
+app.delete('/api/posts/:id', (req, res) => {
+    const postId = req.params.id;
+    
+    db.query('DELETE FROM board WHERE board_id = ?', [postId], (error, results) => {
+        if (error) {
+            console.error("Failed to delete:", error);
+            return res.status(500).json({ status: false, error: 'Failed to delete' });
+        }
+
+        if (results.affectedRows > 0) {
+            res.json({ status: true });
+        } else {
+            res.status(404).json({ status: false, error: 'can not find board_id' });
+        }
     });
 });
 
@@ -230,6 +252,39 @@ app.post('/api/authRefresh', (req,res) => {
         res.json({status: true});
     });
 });
+
+app.post('/api/logout', (req, res) => {
+    if(req.session.user) {
+        req.session.destroy((err) => {
+            if(err){
+                return res.json({status: false, error: err});
+            }
+            res.json({status: true});
+        });
+    }
+});
+
+app.post('/api/comments', (req, res) => {
+    const { postId, comment } = req.body;
+    if (req.session.user) {
+        db.query('SELECT MAX(comments_no) + 1 AS new_comment_no FROM comments', (error, result) => {
+            if (error) {
+                return res.json({ status: false, error: 'Failed to load comments_no' });
+            }
+            const newCommentNo = result[0].new_comment_no || 1; // comments가 비어있을 경우 대비
+            db.query('INSERT INTO comments VALUES (?, ?, ?, ?)', [newCommentNo, postId, comment, req.session.user.name], (error, status) => {
+                if (error) {
+                    return res.json({ status: false, error: 'Failed to insert comment' });
+                }
+                res.json({ status: true, comment_writer: req.session.user.name });
+            });
+        });
+    } else {
+        return res.json({ status: false, error: 'Failed to comment, No session' });
+    }
+});
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
