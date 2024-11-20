@@ -34,18 +34,39 @@ DataBase : Mysql
 
 ## 🤩 Preview
 
-로그인 화면<br/>
+로그인 화면
+<br/>
 <img width="516" alt="스크린샷 2024-11-20 오전 11 16 55" src="https://github.com/user-attachments/assets/482c0710-a419-41e4-801c-ea23a29a16a0">
 
+회원가입 화면
 
 <img width="373" alt="스크린샷 2024-11-20 오전 11 17 13" src="https://github.com/user-attachments/assets/4d75a17d-153f-4ca5-a318-a1bbe330e9d6">
+
+게시판 첫 화면(학생)
+
 <img width="421" alt="스크린샷 2024-11-20 오전 11 17 29" src="https://github.com/user-attachments/assets/d456cda3-f065-4448-be0c-7bb089a0d3a1">
+
+게시물 화면(학생)
+
 <img width="417" alt="스크린샷 2024-11-20 오전 11 17 42" src="https://github.com/user-attachments/assets/ae650b4e-bbfb-4d62-930e-d4f772e33370">
+
+게시판 첫 화면(선생님)
+
 <img width="449" alt="스크린샷 2024-11-20 오전 11 18 05" src="https://github.com/user-attachments/assets/8915f76e-5e98-45fd-92ea-8c3101d61f8a">
+
+게시물 화면(선생님)
+
 <img width="445" alt="스크린샷 2024-11-20 오전 11 18 22" src="https://github.com/user-attachments/assets/c9dfb73a-647a-4710-89f2-d04536b4d9c3">
 
+글작성
+
 <img width="406" alt="스크린샷 2024-11-20 오전 11 17 54" src="https://github.com/user-attachments/assets/7173a4e8-51b0-4d99-87f1-23511382fa37">
+
+회원 리스트
+
 <img width="390" alt="스크린샷 2024-11-20 오전 11 18 36" src="https://github.com/user-attachments/assets/c9d5780f-4843-45ea-b725-54b98e53510c">
+
+secret key 바꾸기 및 확인
 
 <img width="410" alt="스크린샷 2024-11-20 오전 11 18 48" src="https://github.com/user-attachments/assets/8187b403-7397-4920-ac0b-00d62a14f67c">
 
